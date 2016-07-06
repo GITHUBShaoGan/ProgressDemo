@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ArcProgressView">
+        <attr name="arc_image_res_id" format="reference" />
+        <attr name="background_color" format="color" />
+        <attr name="arc_fg_color" format="color" />
+        <attr name="arc_bg_color" format="color" />
+
+        <attr name="arc_width" format="dimension" />
+        <attr name="arc_height" format="dimension" />
+        <attr name="stroke_width" format="dimension"></attr>
+
+        <attr name="max" format="integer" />
+        <attr name="min" format="integer" />
+
+        <attr name="progress" format="float" />
+    </declare-styleable>
+
+</resources>
