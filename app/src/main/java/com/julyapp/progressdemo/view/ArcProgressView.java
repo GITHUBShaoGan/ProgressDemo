@@ -46,18 +46,18 @@ public class ArcProgressView extends View {
 
     private void initAttrs(Context context, AttributeSet attributeSet) {
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ArcProgressView);
-        imageResId = typedArray.getResourceId(R.styleable.ArcProgressView_arc_image_res_id, R.mipmap.ic_launcher);
-        width = typedArray.getDimension(R.styleable.ArcProgressView_arc_width, 100.f);
-        height = typedArray.getDimension(R.styleable.ArcProgressView_arc_height, 100.f);
-        strokeWidth = typedArray.getDimension(R.styleable.ArcProgressView_stroke_width, 2.f);
+        imageResId = typedArray.getResourceId(R.styleable.ArcProgressView_arc_image_res_id, R.mipmap.ic_launcher);//默认背景图片资源id
+        width = typedArray.getDimension(R.styleable.ArcProgressView_arc_width, 100.f);//控件宽度，默认为100px
+        height = typedArray.getDimension(R.styleable.ArcProgressView_arc_height, 100.f);//控件高度，默认为100px
+        strokeWidth = typedArray.getDimension(R.styleable.ArcProgressView_stroke_width, 2.f);//进度条宽度，默认为2px
 
-        backgroundColor = typedArray.getColor(R.styleable.ArcProgressView_background_color, Color.WHITE);
-        arcBackgroundColor = typedArray.getColor(R.styleable.ArcProgressView_arc_bg_color, Color.GRAY);
-        arcForegroundColor = typedArray.getColor(R.styleable.ArcProgressView_arc_fg_color, Color.GREEN);
+        backgroundColor = typedArray.getColor(R.styleable.ArcProgressView_background_color, Color.WHITE);//控件默认背景颜色，默认白色
+        arcBackgroundColor = typedArray.getColor(R.styleable.ArcProgressView_arc_bg_color, Color.GRAY);//进度条背景色，默认灰色
+        arcForegroundColor = typedArray.getColor(R.styleable.ArcProgressView_arc_fg_color, Color.GREEN);//进度条前景色，默认绿色
 
-        max = typedArray.getInteger(R.styleable.ArcProgressView_max, 100);
-        min = typedArray.getInteger(R.styleable.ArcProgressView_min, 0);
-        progress = typedArray.getFloat(R.styleable.ArcProgressView_progress, 30.f);
+        max = typedArray.getInteger(R.styleable.ArcProgressView_max, 100);//最大刻度值
+        min = typedArray.getInteger(R.styleable.ArcProgressView_min, 0);//最小刻度值
+        progress = typedArray.getFloat(R.styleable.ArcProgressView_progress, 30.f);//进度值
     }
 
     @Override
@@ -70,7 +70,8 @@ public class ArcProgressView extends View {
             width = height = min;
         }
 
-        paint.setAntiAlias(true);
+        //设置画笔
+        paint.setAntiAlias(true);//抗锯齿
         paint.setColor(arcBackgroundColor);
         canvas.drawColor(Color.TRANSPARENT);
         paint.setStrokeWidth(strokeWidth);
@@ -82,35 +83,22 @@ public class ArcProgressView extends View {
         rectF.bottom = height - strokeWidth / 2;
 
         canvas.drawArc(rectF, -90, 360, false, paint);//绘制外框大圆
-        paint.setColor(arcForegroundColor);
+        paint.setColor(arcForegroundColor);//改变画笔颜色，准备绘制进度
         canvas.drawArc(rectF, -90, progress / max * 360, false, paint);//绘制进度
 
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+        bitmap = BitmapFactory.decodeResource(context.getResources(), imageResId);//得到背景图片bitmap对象
         if (bitmap != null) {
-            int bmpWidth = bitmap.getWidth();
-            int bmpHeight = bitmap.getHeight();
-            Matrix matrix = new Matrix();
-            float scaleWidth = (float) width / 3 / bmpWidth;//图片大小为控件的1/3
-            float scaleHeight = (float) height / 3 / bmpHeight;
+            int bmpWidth = bitmap.getWidth();//获取bitmap宽
+            int bmpHeight = bitmap.getHeight();//获取bitmap高
+            Matrix matrix = new Matrix();//初始化矩阵
+            float scaleWidth = width / 3 / bmpWidth;//图片宽为控件宽度1/3
+            float scaleHeight = height / 3 / bmpHeight;//图片高为控件高度1/3
             matrix.setScale(scaleWidth, scaleHeight);//缩放倍数
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, true);
-            float left = width / 2 - bitmap.getWidth() / 2;
-            float top = height / 2 - bitmap.getHeight() / 2;
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, true);//得到缩放后的bitmap
+            float left = width / 2 - bitmap.getWidth() / 2;//得到中心点距左边的距离
+            float top = height / 2 - bitmap.getHeight() / 2;//得到中心掉距顶部距离，保证居中
             canvas.drawBitmap(bitmap, left, top, paint);//绘制图片
         }
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        if (bitmap != null && !bitmap.isRecycled()) {
-            bitmap = null;
-            bitmap.recycle();
-        }
-        this.bitmap = bitmap;
-        postInvalidate();
     }
 
     public int getImageResId() {
@@ -118,6 +106,7 @@ public class ArcProgressView extends View {
     }
 
     public void setImageResId(int imageResId) {
+        //每次新设置一张图片时，销毁原有bitmap对象，防止内存泄漏
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
             bitmap = null;
